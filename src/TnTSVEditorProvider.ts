@@ -16,6 +16,8 @@ import {
 
 import { TranslationNotesPanel } from "./panels/TranslationNotesPanel";
 
+type CommandToFunctionMap = Record<string, (text: string) => void>;
+
 /**
  * Provider for tsv editors.
  *
@@ -54,14 +56,28 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
       ],
     };
 
-    new TranslationNotesPanel(webviewPanel, this.context.extensionUri).initializeWebviewContent();
-
     function updateWebview() {
       webviewPanel.webview.postMessage({
-        type: "update",
+        command: "update",
         text: document.getText(),
       });
     }
+
+    const messageEventHandlers = (message: any) => {
+      const { command, text } = message;
+
+      const commandToFunctionMapping: CommandToFunctionMap = {
+        ["loaded"]: updateWebview,
+      };
+
+      commandToFunctionMapping[command](text);
+    };
+
+    new TranslationNotesPanel(
+      webviewPanel,
+      this.context.extensionUri,
+      messageEventHandlers
+    ).initializeWebviewContent();
 
     // Hook up event handlers so that we can synchronize the webview with the text document.
     //
@@ -70,7 +86,6 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
     //
     // Remember that a single text document can also be shared between multiple custom
     // editors (this happens for example when you split a custom editor)
-
     const changeDocumentSubscription = workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() === document.uri.toString()) {
         updateWebview();
@@ -90,8 +105,6 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
     //       return;
     //   }
     // });
-
-    updateWebview();
   }
 
   /**

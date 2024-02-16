@@ -1,6 +1,7 @@
 // import { vscode } from "./utilities/vscode";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { VSCodePanels, VSCodePanelTab, VSCodePanelView } from "@vscode/webview-ui-toolkit/react";
+import { vscode } from "./utilities/vscode";
 import "./App.css";
 import "./codicon.css";
 
@@ -32,11 +33,40 @@ const TITUS_1_1_TSV: ScriptureTSV = {
   },
 };
 
+type CommandToFunctionMap = Record<string, (text: string) => void>;
+
 function App() {
   const chapter = 1;
   const verse = 1;
 
   const [noteIndex, setNoteIndex] = useState(0);
+  const [content, setContent] = useState("");
+
+  const handleMessage = (event: MessageEvent) => {
+    const { command, text } = event.data;
+
+    const commandToFunctionMapping: CommandToFunctionMap = {
+      ["update"]: (text: string) => setContent(text),
+    };
+
+    commandToFunctionMapping[command](text);
+  };
+
+  function sendFirstLoadMessage() {
+    vscode.postMessage({
+      command: "loaded",
+      text: "Webview first load success",
+    });
+  }
+
+  useEffect(() => {
+    window.addEventListener("message", handleMessage);
+    sendFirstLoadMessage();
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   const incrementNoteIndex = () =>
     setNoteIndex((prevIndex) =>
@@ -69,6 +99,7 @@ function App() {
               incrementIndex={incrementNoteIndex}
               decrementIndex={decrementNoteIndex}
             />
+            {content}
           </VSCodePanelView>
         </VSCodePanels>
       </section>

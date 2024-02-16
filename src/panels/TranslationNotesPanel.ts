@@ -24,7 +24,11 @@ export class TranslationNotesPanel {
    * @param panel A reference to the webview panel
    * @param extensionUri The URI of the directory containing the extension
    */
-  public constructor(panel: WebviewPanel, extensionUri: Uri) {
+  public constructor(
+    panel: WebviewPanel,
+    extensionUri: Uri,
+    messageEventHandlers: (message: any) => void
+  ) {
     this._panel = panel;
     this._extensionUri = extensionUri;
 
@@ -33,42 +37,7 @@ export class TranslationNotesPanel {
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
     // Set an event listener to listen for messages passed from the webview context
-    this._setWebviewMessageListener(this._panel.webview);
-  }
-
-  /**
-   * Renders the current webview panel if it exists otherwise a new webview panel
-   * will be created and displayed.
-   *
-   * @param extensionUri The URI of the directory containing the extension.
-   */
-  public static render(extensionUri: Uri) {
-    if (TranslationNotesPanel.currentPanel) {
-      // If the webview panel already exists reveal it
-      TranslationNotesPanel.currentPanel._panel.reveal(ViewColumn.Beside);
-    } else {
-      // If a webview panel does not already exist create and show a new one
-      const panel = window.createWebviewPanel(
-        // Panel view type
-        "showTranslationNotes",
-        // Panel title
-        "Translation Notes",
-        // The editor column the panel should be displayed in
-        ViewColumn.Beside,
-        // Extra panel configurations
-        {
-          // Enable JavaScript in the webview
-          enableScripts: true,
-          // Restrict the webview to only load resources from the `out` and `webview-ui/build` directories
-          localResourceRoots: [
-            Uri.joinPath(extensionUri, "out"),
-            Uri.joinPath(extensionUri, "webview-ui/build"),
-          ],
-        }
-      );
-
-      TranslationNotesPanel.currentPanel = new TranslationNotesPanel(panel, extensionUri);
-    }
+    this._setWebviewMessageListener(this._panel.webview, messageEventHandlers);
   }
 
   /**
@@ -156,22 +125,10 @@ export class TranslationNotesPanel {
    * @param webview A reference to the extension webview
    * @param context A reference to the extension context
    */
-  private _setWebviewMessageListener(webview: Webview) {
-    webview.onDidReceiveMessage(
-      (message: any) => {
-        const { command, text } = message;
-
-        switch (command) {
-          case "hello":
-            // Code that should run in response to the hello message command
-            window.showInformationMessage(text);
-            return;
-          // Add more switch case statements here as more webview message commands
-          // are created within the webview context (i.e. inside media/main.js)
-        }
-      },
-      undefined,
-      this._disposables
-    );
+  private _setWebviewMessageListener(
+    webview: Webview,
+    messageEventHandlers: (message: any) => void
+  ) {
+    webview.onDidReceiveMessage(messageEventHandlers, undefined, this._disposables);
   }
 }
