@@ -13,6 +13,7 @@ import {
   WorkspaceEdit,
   Range,
 } from "vscode";
+import { tsvStringToScriptureTSV } from "scripture-tsv";
 
 import { TranslationNotesPanel } from "./panels/TranslationNotesPanel";
 
@@ -56,12 +57,12 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
       ],
     };
 
-    function updateWebview() {
+    const updateWebview = () => {
       webviewPanel.webview.postMessage({
         command: "update",
-        text: document.getText(),
+        data: this.getDocumentAsScriptureTSV(document),
       });
-    }
+    };
 
     const messageEventHandlers = (message: any) => {
       const { command, text } = message;
@@ -108,20 +109,20 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
   }
 
   /**
-   * Try to get a current document as json text.
+   * Try to get a current document as a scripture TSV object
    *
    * @TODO Use this function to turn doc text into ScriptureTSV!
    */
-  private getDocumentAsJson(document: TextDocument): any {
+  private getDocumentAsScriptureTSV(document: TextDocument): any {
     const text = document.getText();
     if (text.trim().length === 0) {
       return {};
     }
 
     try {
-      return JSON.parse(text);
+      return tsvStringToScriptureTSV(text);
     } catch {
-      throw new Error("Could not get document as json. Content is not valid json");
+      throw new Error("Could not get document as json. Content is not valid scripture TSV");
     }
   }
 
