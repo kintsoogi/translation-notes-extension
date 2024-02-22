@@ -1,6 +1,6 @@
-import React from "react";
-import { markdownToHTML } from "scripture-tsv";
-import type { TranslationNoteType } from "../TnTypes";
+import React from "react"
+import { markdownToHTML } from "../utilities/markdownToHTML"
+import type { TranslationNoteType } from "../../../src/TsvTypes"
 
 /**
  * @component
@@ -16,16 +16,16 @@ import type { TranslationNoteType } from "../TnTypes";
 const TranslationNote: React.FC<{ note: TranslationNoteType }> = ({
   note: { ID, Quote, Note },
 }: {
-  note: TranslationNoteType;
+  note: TranslationNoteType
 }) => {
-  const effectiveQuote = Quote || "General Verse Note";
+  const effectiveQuote = Quote || "General Verse Note"
 
   return (
     <div id={`note_${ID}`}>
       <h3>{effectiveQuote}</h3>
       <div dangerouslySetInnerHTML={{ __html: markdownToHTML(Note) }} />
     </div>
-  );
-};
+  )
+}
 
-export default TranslationNote;
+export default TranslationNote

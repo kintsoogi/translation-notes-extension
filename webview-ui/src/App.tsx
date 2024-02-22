@@ -1,54 +1,54 @@
 // import { vscode } from "./utilities/vscode";
-import { useState, useEffect } from "react";
-import { VSCodePanels, VSCodePanelTab, VSCodePanelView } from "@vscode/webview-ui-toolkit/react";
-import { vscode } from "./utilities/vscode";
-import "./App.css";
-import "./codicon.css";
+import { useState, useEffect } from "react"
+import { VSCodePanels, VSCodePanelTab, VSCodePanelView } from "@vscode/webview-ui-toolkit/react"
+import { vscode } from "./utilities/vscode"
+import "./App.css"
+import "./codicon.css"
 
-import TranslationNoteScroller from "./components/TranslationNoteScroller";
-import type { ScriptureTSV } from "scripture-tsv";
+import TranslationNoteScroller from "./components/TranslationNoteScroller"
+import type { TnTSV } from "../../src/TsvTypes"
 
-type CommandToFunctionMap = Record<string, (text: string) => void>;
+type CommandToFunctionMap = Record<string, (data: any) => void>
 
 function App() {
-  const chapter = 1;
-  const verse = 1;
+  const chapter = 1
+  const verse = 1
 
-  const [noteIndex, setNoteIndex] = useState(0);
-  const [translationNotesObj, setTranslationNotesObj] = useState<ScriptureTSV>({});
+  const [noteIndex, setNoteIndex] = useState(0)
+  const [translationNotesObj, setTranslationNotesObj] = useState<TnTSV>({})
 
   const handleMessage = (event: MessageEvent) => {
-    const { command, data } = event.data;
+    const { command, data } = event.data
 
     const commandToFunctionMapping: CommandToFunctionMap = {
-      ["update"]: (data: ScriptureTSV) => setTranslationNotesObj(data),
-    };
+      ["update"]: (data: TnTSV) => setTranslationNotesObj(data),
+    }
 
-    commandToFunctionMapping[command](data);
-  };
+    commandToFunctionMapping[command](data)
+  }
 
   function sendFirstLoadMessage() {
     vscode.postMessage({
       command: "loaded",
       text: "Webview first load success",
-    });
+    })
   }
 
   useEffect(() => {
-    window.addEventListener("message", handleMessage);
-    sendFirstLoadMessage();
+    window.addEventListener("message", handleMessage)
+    sendFirstLoadMessage()
 
     return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
+      window.removeEventListener("message", handleMessage)
+    }
+  }, [])
 
   const incrementNoteIndex = () =>
     setNoteIndex((prevIndex) =>
       prevIndex < translationNotesObj[chapter][verse].length - 1 ? prevIndex + 1 : prevIndex
-    );
+    )
   const decrementNoteIndex = () =>
-    setNoteIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
+    setNoteIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex))
 
   // TODO: Implement note navigation
   // function handleNoteNavigation() {
@@ -78,7 +78,7 @@ function App() {
         </VSCodePanels>
       </section>
     </main>
-  );
+  )
 }
 
-export default App;
+export default App

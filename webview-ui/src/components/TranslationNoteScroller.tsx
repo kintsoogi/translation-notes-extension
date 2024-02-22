@@ -1,10 +1,10 @@
-import React from "react";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import React from "react"
+import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 
-import TranslationNote from "./TranslationNote";
-import "./TranslationNoteScroller.css";
-import "../App.css";
-import { TranslationNoteType, NoteIndex } from "../TnTypes";
+import TranslationNote from "./TranslationNote"
+import "./TranslationNoteScroller.css"
+import "../App.css"
+import { TranslationNoteType, NoteIndex } from "../../../src/TsvTypes"
 
 const TranslationNoteScroller = ({
   notes,
@@ -12,10 +12,10 @@ const TranslationNoteScroller = ({
   incrementIndex,
   decrementIndex,
 }: {
-  notes: TranslationNoteType[];
-  currentIndex: NoteIndex;
-  incrementIndex: () => void;
-  decrementIndex: () => void;
+  notes: TranslationNoteType[]
+  currentIndex: NoteIndex
+  incrementIndex: () => void
+  decrementIndex: () => void
 }) => {
   return (
     <div className="scroller-container">
@@ -41,7 +41,7 @@ const TranslationNoteScroller = ({
         </VSCodeButton>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TranslationNoteScroller;
+export default TranslationNoteScroller

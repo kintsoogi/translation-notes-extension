@@ -12,12 +12,12 @@ import {
   CancellationToken,
   WorkspaceEdit,
   Range,
-} from "vscode";
-import { tsvStringToScriptureTSV } from "scripture-tsv";
+} from "vscode"
+import { tsvStringToScriptureTSV } from "./utilities/tsvFileConversions"
 
-import { TranslationNotesPanel } from "./panels/TranslationNotesPanel";
+import { TranslationNotesPanel } from "./panels/TranslationNotesPanel"
 
-type CommandToFunctionMap = Record<string, (text: string) => void>;
+type CommandToFunctionMap = Record<string, (text: string) => void>
 
 /**
  * Provider for tsv editors.
@@ -28,15 +28,15 @@ type CommandToFunctionMap = Record<string, (text: string) => void>;
  */
 export class TnTSVEditorProvider implements CustomTextEditorProvider {
   public static register(context: ExtensionContext): Disposable {
-    const provider = new TnTSVEditorProvider(context);
+    const provider = new TnTSVEditorProvider(context)
     const providerRegistration = window.registerCustomEditorProvider(
       TnTSVEditorProvider.viewType,
       provider
-    );
-    return providerRegistration;
+    )
+    return providerRegistration
   }
 
-  private static readonly viewType = "translation-notes-extension.tsvNoteEditor";
+  private static readonly viewType = "translation-notes-extension.tsvNoteEditor"
 
   constructor(private readonly context: ExtensionContext) {}
 
@@ -55,30 +55,30 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
         Uri.joinPath(this.context.extensionUri, "out"),
         Uri.joinPath(this.context.extensionUri, "webview-ui/build"),
       ],
-    };
+    }
 
     const updateWebview = () => {
       webviewPanel.webview.postMessage({
         command: "update",
         data: this.getDocumentAsScriptureTSV(document),
-      });
-    };
+      })
+    }
 
     const messageEventHandlers = (message: any) => {
-      const { command, text } = message;
+      const { command, text } = message
 
       const commandToFunctionMapping: CommandToFunctionMap = {
         ["loaded"]: updateWebview,
-      };
+      }
 
-      commandToFunctionMapping[command](text);
-    };
+      commandToFunctionMapping[command](text)
+    }
 
     new TranslationNotesPanel(
       webviewPanel,
       this.context.extensionUri,
       messageEventHandlers
-    ).initializeWebviewContent();
+    ).initializeWebviewContent()
 
     // Hook up event handlers so that we can synchronize the webview with the text document.
     //
@@ -89,14 +89,14 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
     // editors (this happens for example when you split a custom editor)
     const changeDocumentSubscription = workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() === document.uri.toString()) {
-        updateWebview();
+        updateWebview()
       }
-    });
+    })
 
     // Make sure we get rid of the listener when our editor is closed.
     webviewPanel.onDidDispose(() => {
-      changeDocumentSubscription.dispose();
-    });
+      changeDocumentSubscription.dispose()
+    })
 
     // TODO: Handle user editing TSV file
     // webviewPanel.webview.onDidReceiveMessage((e) => {
@@ -114,15 +114,15 @@ export class TnTSVEditorProvider implements CustomTextEditorProvider {
    * @TODO Use this function to turn doc text into ScriptureTSV!
    */
   private getDocumentAsScriptureTSV(document: TextDocument): any {
-    const text = document.getText();
+    const text = document.getText()
     if (text.trim().length === 0) {
-      return {};
+      return {}
     }
 
     try {
-      return tsvStringToScriptureTSV(text);
+      return tsvStringToScriptureTSV(text)
     } catch {
-      throw new Error("Could not get document as json. Content is not valid scripture TSV");
+      throw new Error("Could not get document as json. Content is not valid scripture TSV")
     }
   }
 
