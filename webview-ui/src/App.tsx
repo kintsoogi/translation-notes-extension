@@ -58,6 +58,17 @@ function App() {
   //   });
   // }
 
+  const content = !!translationNotesObj?.[chapter]?.[verse] ? (
+    <TranslationNoteScroller
+      notes={translationNotesObj[chapter][verse] || {}}
+      currentIndex={noteIndex}
+      incrementIndex={incrementNoteIndex}
+      decrementIndex={decrementNoteIndex}
+    />
+  ) : (
+    "No translation notes available for this verse."
+  )
+
   return (
     <main>
       <section className="translation-note-view">
@@ -67,14 +78,7 @@ function App() {
           <VSCodePanelTab id="tab-verse">VERSE NOTES</VSCodePanelTab>
           {/* <VSCodePanelView id="view-book">Problems content.</VSCodePanelView> */}
           {/* <VSCodePanelView id="view-chapter">Output content.</VSCodePanelView> */}
-          <VSCodePanelView id="view-verse">
-            <TranslationNoteScroller
-              notes={translationNotesObj[chapter][verse]}
-              currentIndex={noteIndex}
-              incrementIndex={incrementNoteIndex}
-              decrementIndex={decrementNoteIndex}
-            />
-          </VSCodePanelView>
+          <VSCodePanelView id="view-verse">{content}</VSCodePanelView>
         </VSCodePanels>
       </section>
     </main>

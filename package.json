@@ -50,6 +50,8 @@
     "vscode-test": "^1.5.0"
   },
   "dependencies": {
-    "scripture-tsv": "^1.1.0"
+    "bible-reference-range": "^1.1.1",
+    "dompurify": "^3.0.9",
+    "marked": "^12.0.0"
   }
 }

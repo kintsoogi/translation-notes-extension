@@ -16,5 +16,10 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["./src"]
+  "include": [
+    "./src",
+    "../src/utilities/tsvFileConversions.ts",
+    "../src/utilities/tsvFileConversions.test.ts",
+    "../src/TsvTypes.d.ts"
+  ]
 }
